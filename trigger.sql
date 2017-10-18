@@ -1,0 +1,15 @@
+USE testDB;
+
+DROP FUNCTION IF EXISTS myNotifyChanged;
+DROP TRIGGER IF EXISTS myUpdateNotify;
+
+CREATE FUNCTION myNotifyChanged RETURNS INTEGER SONAME 'myNotify.so';
+
+
+DELIMITER ##
+CREATE TRIGGER myUpdateNotify BEFORE UPDATE ON test
+ FOR EACH ROW 
+  BEGIN 
+   SELECT myNotifyChanged(0, 0) INTO @x;
+  END##
+DELIMITER ;
