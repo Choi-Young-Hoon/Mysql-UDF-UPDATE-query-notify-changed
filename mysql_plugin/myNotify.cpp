@@ -19,31 +19,28 @@ extern "C" {
 }
 
 //struct sockaddr_in 초기화.
-void setSockAddr(struct sockaddr_in * addr, int port, char * ip_address){
+void setSockAddr(struct sockaddr_in * addr, int port, const char * ip_address){
 	memset(addr, 0x00, sizeof(struct sockaddr_in));
 	addr->sin_family = PF_INET;
 	addr->sin_port = htons(port);
-	addr->sin_addr->s_addr = inet_addr(ip_address);
+	addr->sin_addr.s_addr = inet_addr(ip_address);
 }
 
 //Connect 함수.
 int connectToServer(char * message){
-	struct sockaddr_in saddr, conaddr;
+	struct sockaddr_in addr;
 	
-	// @TODO sin_port 에 0이 아닌 다른값이 들어가면 bind Error 
-	// 이유는 아직 모름.
-	setSockAddr(&addr_local, 0, "127.0.0.1");
-	if(bind(sockfd, (struct sockaddr*)&addr_local, sizeof(addr_local)) == -1){
+	setSockAddr(&addr, SERVER_PORT, "127.0.0.1");
+	if(bind(sockfd, (struct sockaddr*)&addr, sizeof(addr)) == -1){
 		strcpy(message, "bind() failed");
 		return -1;
 	}
 
-	setSockAddr(&addr_connect, SERVER_PORT, "127.0.0.1");	
-	if(connect(sockfd, (struct sockaddr*)&addr_connect, sizeof(addr_connect)) == -1){
+	if(connect(sockfd, (struct sockaddr*)&addr, sizeof(addr)) == -1){
 		strcpy(message, "Connect Failed");
 		return -1;
 	}
-
+	return 0;
 }
 
 //Mysql myNotifyChanged() 호출시 초기화 함수로 실행.
