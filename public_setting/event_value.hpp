@@ -1,5 +1,12 @@
 #ifndef __PUBLIC_SETTING_EVENT_VALUE_HEADER__
 #define __PUBLIC_SETTING_EVENT_VALUE_HEADER__
+
+//서버 포트
+enum SERVER_CONFIG {
+	SERVER_PORT = 40000,
+};
+
+//쿼리에 대한 이벤트 값.
 enum QUERY_EVENT_NOTIFY {
 	INSERT = 0,
 	DELETE,

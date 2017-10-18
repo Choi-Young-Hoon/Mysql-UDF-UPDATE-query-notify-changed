@@ -9,7 +9,8 @@ namespace myNotify {
 		MysqlNotifyChanged() : TcpServer(){}
 		MysqlNotifyChanged(int port) : TcpServer(port){}
 		virtual ~MysqlNotifyChanged(){}
-		
+
+		//Event Loop 시작.
 		bool StartNotifyChangedEvent(){
 			if(!ServerSetting())
 				return false;
@@ -25,13 +26,15 @@ namespace myNotify {
 		}
 
 	private:
+		//TcpServer 객체 초기화.
 		bool ServerSetting(){
 			if(!TcpServer::SetBufferSize(512)) return false;
 			if(!TcpServer::CreateSocket()) return false;
 			if(!TcpServer::Bind()) return false;
 			return true;
 		}
-
+		
+		//각 쿼리에 대한 이벤트 호출
 		void Run(char * buffer){
 			switch(atoi(buffer)){
 			case QUERY_EVENT_NOTIFY::INSERT:

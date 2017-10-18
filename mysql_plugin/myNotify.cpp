@@ -1,6 +1,6 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 
 #include <mysql.h>
 
@@ -11,60 +11,72 @@
 
 #include "public_setting/event_value.hpp"
 
+static int sockfd = 0;
+
 extern "C" {
 	my_bool myNotifyChanged_init(UDF_INIT * initid, UDF_ARGS * args, char * message);
 	long long myNotifyChanged(UDF_INIT * initid, UDF_ARGS * args, char * is_null, char * error);
 }
 
-static int sockfd = 0;
+//struct sockaddr_in 초기화.
+void setSockAddr(struct sockaddr_in * addr, int port, char * ip_address){
+	memset(addr, 0x00, sizeof(struct sockaddr_in));
+	addr->sin_family = PF_INET;
+	addr->sin_port = htons(port);
+	addr->sin_addr->s_addr = inet_addr(ip_address);
+}
 
-my_bool myNotifyChanged_init(UDF_INIT * initid, UDF_ARGS *args, char *message){
+//Connect 함수.
+int connectToServer(char * message){
 	struct sockaddr_in saddr, conaddr;
-	if(args->arg_count != 1){
-		strcpy(message, "Err 1");
+	
+	// @TODO sin_port 에 0이 아닌 다른값이 들어가면 bind Error 
+	// 이유는 아직 모름.
+	setSockAddr(&addr_local, 0, "127.0.0.1");
+	if(bind(sockfd, (struct sockaddr*)&addr_local, sizeof(addr_local)) == -1){
+		strcpy(message, "bind() failed");
 		return -1;
 	}
 
-	if(args->arg_type[0] != INT_RESULT){
-		strcpy(message, "Err 2");
+	setSockAddr(&addr_connect, SERVER_PORT, "127.0.0.1");	
+	if(connect(sockfd, (struct sockaddr*)&addr_connect, sizeof(addr_connect)) == -1){
+		strcpy(message, "Connect Failed");
+		return -1;
+	}
+
+}
+
+//Mysql myNotifyChanged() 호출시 초기화 함수로 실행.
+my_bool myNotifyChanged_init(UDF_INIT * initid, UDF_ARGS *args, char *message){
+	if(args->arg_count != 1){ // Args count 체크.
+		strcpy(message, "Err arg count");
+		return -1;
+	}
+
+	if(args->arg_type[0] != INT_RESULT){ // Args type 체크.
+		strcpy(message, "Err arg type");
 		return -1;
 	}
 
 	sockfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 	if(sockfd == -1)
 		return -1;
-
-	////???????????????
-	// @TODO sin_port 에 0이 아닌 다른값이 들어가면 bind Error 
-	memset(&saddr, 0, sizeof(saddr));
-	saddr.sin_family = PF_INET;
-	saddr.sin_port = htons(0);
-	saddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-	if(bind(sockfd, (struct sockaddr*)&saddr, sizeof(saddr)) == -1){
-		strcpy(message, "bind() failed");
+	
+	if(connectToServer(message) == -1)
 		return -1;
-	}
-
-	memset(&conaddr, 0x00, sizeof(conaddr));
-	conaddr.sin_family = PF_INET;
-	conaddr.sin_port = htons(40000);
-	conaddr.sin_addr.s_addr = inet_addr("127.0.0.1");
-	if(connect(sockfd, (struct sockaddr*)&conaddr, sizeof(conaddr)) == -1){
-		strcpy(message, "Connect Failed");
-		return -1;
-	}
-
 	return 0;
 }
 
+//myNotifyChanged() 종료시 수행.
 void myNotifyChanged_deinit(UDF_INIT * inifid){
 	if(sockfd != 0){
 		close(sockfd);
 	}
 }
 
+// DoWork()
 long long myNotifyChanged(UDF_INIT * initid, UDF_ARGS * args, 
-				char *is_null, char * error){
+					char *is_null, char * error){
 	char data[512] = {0, };
 	sprintf(data, "%d",  *((int*)args->args[0]));
 	send(sockfd, data, strlen(data), 0);

@@ -4,22 +4,16 @@
 #include <iostream>
 using namespace std;
 
+//MysqlNotifyChanged 인터페이스 구현
 class MysqlEvent : public myNotify::MysqlNotifyChanged {
 public:
-	MysqlEvent() : myNotify::MysqlNotifyChanged(40000) {}
+	MysqlEvent() : myNotify::MysqlNotifyChanged(SERVER_CONFIG::SERVER_PORT) {}
 	virtual ~MysqlEvent() {}
 
-	virtual void InsertEvent(){
-		cout << "Insert Event!!" << endl;		
-	}
-
-	virtual void DeleteEvent(){
-		cout << "Delete Event!!" << endl;
-	}
-
-	virtual void UpdateEvent(){
-		cout << "Update Event!!" << endl;
-	}
+	// Interface 구현
+	virtual void InsertEvent(){ cout << "Insert Event!!" << endl; }
+	virtual void DeleteEvent(){ cout << "Delete Event!!" << endl; }
+	virtual void UpdateEvent(){ cout << "Update Event!!" << endl; }
 };
 
 int main(void){

@@ -11,12 +11,10 @@
 namespace myNotify {
 	class TcpServer {
 	public:
-		TcpServer() 
-			: buffer(NULL), server_fd(0) {}
-		TcpServer(int port) 
-			: server_port(port) {}
+		TcpServer() : buffer(NULL), server_fd(0) {}
+		TcpServer(int port) : server_port(port) {}
 		virtual ~TcpServer(){
-			if(buffer != NULL)
+			if(buffer != NULL) 
 				delete []buffer;
 			Close();
 		}
@@ -63,17 +61,20 @@ namespace myNotify {
 			buffer_size = size;
 			return true;
 		}
-		
+		// Getter, Setter 
 		inline void SetPort(int port){ server_port = port; }
 		inline int GetPort(){ return server_port; }
 		inline char * GetBuffer(){ return buffer; }
 	private:
+		//Server
 		int server_fd;
 		int server_port;
 
-		int client_fd;
+		//Client
+		int client_fd; 
 		struct sockaddr_in client_addr;
 
+		//Recv buffer
 		char * buffer;
 		int buffer_size;
 	};
