@@ -11,22 +11,24 @@
 namespace MyNotify {
 	class TcpServer {
 	public:
-		TcpServer() : buffer(NULL), server_fd(0) {}
-		TcpServer(int port) : server_port(port) {}
+		TcpServer() : buffer(NULL), server_fd(0) 
+		{}
+		TcpServer(int port) : server_port(port) 
+		{}
 		virtual ~TcpServer(){
 			if (buffer != NULL) 
 				delete []buffer;
 			Close();
 		}
 
-		inline bool CreateSocket(){
+		bool CreateSocket(){
 			server_fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
 			if (server_fd == -1)
 				return false;
 			return true;
 		}
 
-		inline bool Bind(){
+		bool Bind(){
 			struct sockaddr_in serv_addr;
 			serv_addr.sin_family = PF_INET;
 			serv_addr.sin_port = htons(server_port);
@@ -39,22 +41,22 @@ namespace MyNotify {
 			return true;
 		}
 
-		inline int Accept(){
+		int Accept(){
 			socklen_t addr_size = sizeof(client_addr);
 			client_fd = accept(server_fd, (struct sockaddr*)&client_addr, &addr_size);
 			return client_fd;
 		}
 
 		//Recv, Send
-		inline int Recv(){ return recv(client_fd, buffer, buffer_size, 0); }
-		inline int Send(char * buf){ return send(client_fd, buf, strlen(buf), 0); }
+		int Recv(){ return recv(client_fd, buffer, buffer_size, 0); }
+		int Send(char * buf){ return send(client_fd, buf, strlen(buf), 0); }
 
-		inline void Close(){
+		void Close(){
 			if (server_fd != 0)
 				close(server_fd);
 		}
 
-		inline bool SetBufferSize(int size){
+		bool SetBufferSize(int size){
 			buffer = new char[size];
 			if (buffer == NULL)
 				return false;
