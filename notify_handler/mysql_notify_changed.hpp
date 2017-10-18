@@ -6,16 +6,9 @@
 namespace myNotify {
 	class MysqlNotifyChanged : public TcpServer{
 	public:
-		MysqlNotifyChanged() : TcpServer(){
-
-		}
-		MysqlNotifyChanged(int port) : TcpServer(port){
-
-		}
-		
-		virtual ~MysqlNotifyChanged(){
-
-		}
+		MysqlNotifyChanged() : TcpServer(){}
+		MysqlNotifyChanged(int port) : TcpServer(port){}
+		virtual ~MysqlNotifyChanged(){}
 		
 		bool StartNotifyChangedEvent(){
 			if(!ServerSetting())
