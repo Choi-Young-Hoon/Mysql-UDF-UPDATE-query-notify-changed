@@ -2,8 +2,10 @@
 #define __NOTIFY_HANDLER_MYSQL_NOTIFY_CHANGED_HEADER__
 #include "tcp_server.hpp"
 #include "public_setting/event_value.hpp"
+
 #include <cstdlib>
-namespace myNotify {
+
+namespace MyNotify {
 	class MysqlNotifyChanged : public TcpServer{
 	public:
 		MysqlNotifyChanged() : TcpServer()

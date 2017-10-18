@@ -5,9 +5,9 @@
 using namespace std;
 
 //MysqlNotifyChanged 인터페이스 구현
-class MysqlEvent : public myNotify::MysqlNotifyChanged {
+class MysqlEvent : public MyNotify::MysqlNotifyChanged {
 public:
-	MysqlEvent() : myNotify::MysqlNotifyChanged(SERVER_CONFIG::SERVER_PORT) {}
+	MysqlEvent() : MyNotify::MysqlNotifyChanged(SERVER_CONFIG::SERVER_PORT) {}
 	virtual ~MysqlEvent() {}
 
 	// Interface 구현

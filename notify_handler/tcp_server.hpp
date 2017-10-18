@@ -8,7 +8,7 @@
 
 #include <cstring>
 
-namespace myNotify {
+namespace MyNotify {
 	class TcpServer {
 	public:
 		TcpServer() : buffer(NULL), server_fd(0) {}
