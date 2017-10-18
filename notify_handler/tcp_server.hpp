@@ -14,14 +14,14 @@ namespace myNotify {
 		TcpServer() : buffer(NULL), server_fd(0) {}
 		TcpServer(int port) : server_port(port) {}
 		virtual ~TcpServer(){
-			if(buffer != NULL) 
+			if (buffer != NULL) 
 				delete []buffer;
 			Close();
 		}
 
 		inline bool CreateSocket(){
 			server_fd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-			if(server_fd == -1)
+			if (server_fd == -1)
 				return false;
 			return true;
 		}
@@ -32,9 +32,9 @@ namespace myNotify {
 			serv_addr.sin_port = htons(server_port);
 			serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 
-			if(bind(server_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) == -1)
+			if (bind(server_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) == -1)
 				return false;
-			if(listen(server_fd, 3) == -1)
+			if (listen(server_fd, 3) == -1)
 				return false;
 			return true;
 		}
@@ -50,13 +50,13 @@ namespace myNotify {
 		inline int Send(char * buf){ return send(client_fd, buf, strlen(buf), 0); }
 
 		inline void Close(){
-			if(server_fd != 0)
+			if (server_fd != 0)
 				close(server_fd);
 		}
 
 		inline bool SetBufferSize(int size){
 			buffer = new char[size];
-			if(buffer == NULL)
+			if (buffer == NULL)
 				return false;
 			buffer_size = size;
 			return true;

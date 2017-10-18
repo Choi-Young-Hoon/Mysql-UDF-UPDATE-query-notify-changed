@@ -31,12 +31,12 @@ int connectToServer(char * message){
 	struct sockaddr_in addr;
 	
 	setSockAddr(&addr, SERVER_PORT, "127.0.0.1");
-	if(bind(sockfd, (struct sockaddr*)&addr, sizeof(addr)) == -1){
+	if (bind(sockfd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
 		strcpy(message, "bind() failed");
 		return -1;
 	}
 
-	if(connect(sockfd, (struct sockaddr*)&addr, sizeof(addr)) == -1){
+	if (connect(sockfd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
 		strcpy(message, "Connect Failed");
 		return -1;
 	}
@@ -45,35 +45,34 @@ int connectToServer(char * message){
 
 //Mysql myNotifyChanged() 호출시 초기화 함수로 실행.
 my_bool myNotifyChanged_init(UDF_INIT * initid, UDF_ARGS *args, char *message){
-	if(args->arg_count != 1){ // Args count 체크.
+	if (args->arg_count != 1) { // Args count 체크.
 		strcpy(message, "Err arg count");
 		return -1;
 	}
 
-	if(args->arg_type[0] != INT_RESULT){ // Args type 체크.
+	if (args->arg_type[0] != INT_RESULT) { // Args type 체크.
 		strcpy(message, "Err arg type");
 		return -1;
 	}
 
 	sockfd = socket(PF_INET, SOCK_STREAM, IPPROTO_TCP);
-	if(sockfd == -1)
+	if (sockfd == -1)
 		return -1;
 	
-	if(connectToServer(message) == -1)
+	if (connectToServer(message) == -1)
 		return -1;
 	return 0;
 }
 
 //myNotifyChanged() 종료시 수행.
 void myNotifyChanged_deinit(UDF_INIT * inifid){
-	if(sockfd != 0){
+	if (sockfd != 0) {
 		close(sockfd);
 	}
 }
 
 // DoWork()
-long long myNotifyChanged(UDF_INIT * initid, UDF_ARGS * args, 
-					char *is_null, char * error){
+long long myNotifyChanged(UDF_INIT * initid, UDF_ARGS * args, char *is_null, char * error){
 	char data[512] = {0, };
 	sprintf(data, "%d",  *((int*)args->args[0]));
 	send(sockfd, data, strlen(data), 0);
