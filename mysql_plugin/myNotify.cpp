@@ -1,7 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
 
 #include <mysql.h>
 
@@ -9,6 +8,8 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+
+#include "public_setting/event_value.hpp"
 
 extern "C" {
 	my_bool myNotifyChanged_init(UDF_INIT * initid, UDF_ARGS * args, char * message);
@@ -19,12 +20,12 @@ static int sockfd = 0;
 
 my_bool myNotifyChanged_init(UDF_INIT * initid, UDF_ARGS *args, char *message){
 	struct sockaddr_in saddr, conaddr;
-	if(args->arg_count != 2){
+	if(args->arg_count != 1){
 		strcpy(message, "Err 1");
 		return -1;
 	}
 
-	if(args->arg_type[0] != INT_RESULT || args->arg_type[1] != INT_RESULT){
+	if(args->arg_type[0] != INT_RESULT){
 		strcpy(message, "Err 2");
 		return -1;
 	}
@@ -33,6 +34,8 @@ my_bool myNotifyChanged_init(UDF_INIT * initid, UDF_ARGS *args, char *message){
 	if(sockfd == -1)
 		return -1;
 
+	////???????????????
+	// @TODO sin_port 에 0이 아닌 다른값이 들어가면 bind Error 
 	memset(&saddr, 0, sizeof(saddr));
 	saddr.sin_family = PF_INET;
 	saddr.sin_port = htons(0);
@@ -63,8 +66,7 @@ void myNotifyChanged_deinit(UDF_INIT * inifid){
 long long myNotifyChanged(UDF_INIT * initid, UDF_ARGS * args, 
 				char *is_null, char * error){
 	char data[512] = {0, };
-
-	sprintf(data, "Update changed");
+	sprintf(data, "%d",  *((int*)args->args[0]));
 	send(sockfd, data, strlen(data), 0);
 	return 0;
 }

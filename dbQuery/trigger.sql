@@ -1,0 +1,29 @@
+USE testDB;
+
+DROP FUNCTION IF EXISTS myNotifyChanged;
+DROP TRIGGER IF EXISTS myInsertNotify;
+DROP TRIGGER IF EXISTS myDeleteNotify;
+DROP TRIGGER IF EXISTS myUpdateNotify;
+
+CREATE FUNCTION myNotifyChanged RETURNS INTEGER SONAME 'myNotify.so';
+
+
+DELIMITER ##
+CREATE TRIGGER myInsertNotify BEFORE INSERT ON test
+ FOR EACH ROW 
+  BEGIN 
+   SELECT myNotifyChanged(0) INTO @x;
+  END##
+
+CREATE TRIGGER myDeleteNotify BEFORE DELETE ON test 
+ FOR EACH ROW  
+  BEGIN
+   SELECT myNotifyChanged(1) INTO @x;
+  END##
+
+CREATE TRIGGER myUpdateNotify BEFORE UPDATE ON test 
+ FOR EACH ROW 
+  BEGIN
+   SELECT myNotifyChanged(2) INTO @x;
+  END##
+DELIMITER ;
